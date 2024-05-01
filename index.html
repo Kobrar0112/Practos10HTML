@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Управление автомобилями</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+body {
+  background-image: url('3.jpg'); 
+ 
+  background-position: center; 
+ 
+}
+.container {
+  backdrop-filter: blur(10px);
+}
+.form-group, h1, .car-item{
+  color: white;
+}
+.btn-primary{
+  background: rgb(0, 21, 75);
+  color: white;
+}
+.btn-primary:hover{
+  color: rgb(200, 255, 0);
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Управление автомобилями</h1>
+    <form id="carForm">
+      <div class="form-group">
+        <label for="carMake">Марка:</label>
+        <input type="text" class="form-control" id="carMake" required>
+      </div>
+      <div class="form-group">
+        <label for="carModel">Модель:</label>
+        <input type="text" class="form-control" id="carModel" required>
+      </div>
+      <div class="form-group">
+        <label for="carYear">Год выпуска:</label>
+        <input type="number" class="form-control" id="carYear" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Добавить автомобиль</button>
+    </form>
+    <hr>
+    <div id="carList">
+
+    </div>
+  </div>
+
+
+  <div class="btn btn-primary" id="editModal" style="display: none; position: fixed; top: 20%; left: 50%; transform: translateX(-50%); background: white; padding: 20px; border-radius: 5px; box-shadow: 0px 0px 10px rgba(0,0,0,0.5);">
+    <div class="form-group">
+      <label for="editMake">Марка:</label>
+      <input type="text" class="form-control" id="editMake">
+    </div>
+    <div class="form-group">
+      <label for="editModel">Модель:</label>
+      <input type="text" class="form-control" id="editModel">
+    </div>
+    <div class="form-group">
+      <label for="editYear">Год выпуска:</label>
+      <input type="number" class="form-control" id="editYear">
+    </div>
+    <button id="saveChanges" class="btn btn-success">Сохранить изменения</button>
+    <button onclick="document.getElementById('editModal').style.display='none'" class="btn btn-secondary">Закрыть</button>
+  </div>
+
+  <script>
+    class Car {
+      constructor(make, model, year, element) {
+        this.make = make;
+        this.model = model;
+        this.year = year;
+        this.element = element;
+      }
+
+      getInfo() {
+        return ` <strong>Марка:</strong> ${this.make}, <strong>Модель:</strong> ${this.model}, <strong>Год выпуска:</strong> ${this.year}`;
+      }
+
+      updateInfo() {
+        this.element.innerHTML = this.getInfo();
+      }
+    }
+
+    function addCarToList(car) {
+      var carItem = document.createElement("div");
+      carItem.classList.add("car-item");
+      carItem.innerHTML = car.getInfo();
+
+   
+      var deleteButton = document.createElement("button");
+      deleteButton.textContent = "Удалить";
+      deleteButton.classList.add("btn", "btn-danger", "ml-2");
+      deleteButton.onclick = function() {
+        carItem.remove();
+      };
+
+      var editButton = document.createElement("button");
+      editButton.textContent = "Изменить";
+      editButton.classList.add("btn", "btn-secondary", "ml-2");
+      editButton.onclick = function() {
+        openEditModal(car);
+      };
+
+      carItem.appendChild(deleteButton);
+      carItem.appendChild(editButton);
+      document.getElementById("carList").appendChild(carItem);
+
+      car.element = carItem;  
+    }
+
+    document.getElementById("carForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+      var make = document.getElementById("carMake").value;
+      var model = document.getElementById("carModel").value;
+      var year = document.getElementById("carYear").value;
+      var car = new Car(make, model, year);
+      addCarToList(car);
+      document.getElementById("carMake").value = "";
+      document.getElementById("carModel").value = "";
+      document.getElementById("carYear").value = "";
+    });
+
+    function openEditModal(car) {
+  document.getElementById('editMake').value = car.make;
+  document.getElementById('editModel').value = car.model;
+  document.getElementById('editYear').value = car.year;
+  document.getElementById('editModal').style.display = 'block';
+
+  document.getElementById('saveChanges').onclick = function() {
+    car.make = document.getElementById('editMake').value;
+    car.model = document.getElementById('editModel').value;
+    car.year = document.getElementById('editYear').value;
+    car.updateInfo();
+    document.getElementById('editModal').style.display = 'none';
+
+ 
+    var deleteButton = document.createElement("button");
+    deleteButton.textContent = "Удалить";
+    deleteButton.classList.add("btn", "btn-danger", "ml-2");
+    deleteButton.onclick = function() {
+      carItem.remove();
+    };
+
+    var editButton = document.createElement("button");
+    editButton.textContent = "Изменить";
+    editButton.classList.add("btn", "btn-secondary", "ml-2");
+    editButton.onclick = function() {
+      openEditModal(car);
+    };
+
+    var carItem = car.element;
+    carItem.appendChild(deleteButton);
+    carItem.appendChild(editButton);
+  };
+}
+  </script>
+</body>
+</html>
